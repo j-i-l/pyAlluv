@@ -42,7 +42,7 @@ class AlluvialPlot(object):
                 - y_lim: tuple
                 - set_x_pos: boolean if nodes is a dict then the key is set
                     for all nodes
-                - node_width: overwrites the width of all nodes
+                - node_width: (NOT IMPLEMENTED) overwrites width of all nodes
                 - x_axis_offset: how much space (relative to total height)
                     should be reserved for the x_axis. If set to 0.0, then
                     the x labels will not be visible.
@@ -85,6 +85,7 @@ class AlluvialPlot(object):
                 for node in self.nodes[x_pos]:
                     node.x_pos = x_pos
         self._x_dates = False
+        _minor_tick = 'months'
         if isinstance(self.x_positions[0], datetime):
             # assign date locator/formatter to the x-axis to get proper labels
             if self.format_xaxis:
@@ -93,6 +94,8 @@ class AlluvialPlot(object):
                 axes.xaxis.set_major_locator(locator)
                 axes.xaxis.set_major_formatter(formatter)
             self._x_dates = True
+            if (self.x_positions[-1] - self.x_positions[0]).days < 2*30:
+                _minor_tick = 'weeks'
             self.nodes = {
                     mdates.date2num(x_pos): self.nodes[x_pos]
                     for x_pos in self.x_positions
@@ -110,6 +113,7 @@ class AlluvialPlot(object):
                                 )
                     node.set_x_pos(mdates.date2num(node.x_pos))
 
+        # TODO: set the node.width property with this
         self.node_width = kwargs.get('node_width', None)
         self.node_w_spacing = node_w_spacing
         self.x_lim = kwargs.get(
@@ -202,6 +206,9 @@ class AlluvialPlot(object):
         axes.spines['left'].set_color('none')
         axes.spines['top'].set_color('none')
         axes.spines['bottom'].set_color('none')
+        if self._x_dates:
+            # set dates as x-axis
+            self.set_dates_xaxis(axes, _minor_tick)
 
     def distribute_nodes(self, x_pos):
         """
@@ -297,6 +304,26 @@ class AlluvialPlot(object):
             self.y_max,
             _max_y
         ) if self.y_max is not None else _max_y
+
+    def set_dates_xaxis(self, ax, resolution='months'):
+        import matplotlib.dates as mdates
+        years = mdates.YearLocator()
+        months = mdates.MonthLocator()
+        weeks = mdates.WeekdayLocator(mdates.MONDAY)
+        if resolution == 'months':
+            monthsFmt = mdates.DateFormatter('%b')
+            yearsFmt = mdates.DateFormatter('\n%Y')  # add space
+            ax.xaxis.set_minor_locator(months)
+            ax.xaxis.set_minor_formatter(monthsFmt)
+            ax.xaxis.set_major_locator(years)
+            ax.xaxis.set_major_formatter(yearsFmt)
+        elif resolution == 'weeks':
+            monthsFmt = mdates.DateFormatter('\n%b')
+            weeksFmt = mdates.DateFormatter('%b %d')
+            ax.xaxis.set_minor_locator(weeks)
+            ax.xaxis.set_minor_formatter(weeksFmt)
+            ax.xaxis.set_major_locator(months)
+            ax.xaxis.set_major_formatter(monthsFmt)
 
     def _swap_nodes(self, n1, n2, direction='backwards'):
         squared_diff = {}
@@ -835,6 +862,9 @@ class Flux(object):
         """
         self._interp_steps = kwargs.pop('interpolation_steps', 1)
         self.out_flux_vanish = kwargs.pop('out_flux_vanish', 'top')
+        self.default_fc = kwargs.pop('default_fc', 'gray')
+        self.default_ec = kwargs.pop('default_ec', 'gray')
+        self.default_alpha = kwargs.pop('default_alpha', 0.5)
         self.closed = kwargs.pop('closed', False)
         self.readonly = kwargs.pop('readonly', False)
         self.patch_kwargs = kwargs
@@ -889,6 +919,12 @@ class Flux(object):
             # set it back
             else:
                 _kwargs[_color] = _set_color
+                if _set_color is None:
+                    if _color == 'facecolor':
+                        _kwargs[_color] = self.default_fc
+                    elif _color == 'edgecolor':
+                        _kwargs[_color] = self.default_ec
+        _kwargs['alpha'] = _kwargs.get('alpha', self.default_alpha)
         # set in/out only flux styling
         _in_kwargs = dict(_kwargs)
         _in_kwargs.update(_to_in_kwargs)
