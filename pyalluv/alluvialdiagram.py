@@ -864,7 +864,7 @@ class Flux(object):
         self.out_flux_vanish = kwargs.pop('out_flux_vanish', 'top')
         self.default_fc = kwargs.pop('default_fc', 'gray')
         self.default_ec = kwargs.pop('default_ec', 'gray')
-        self.default_alpha = kwargs.pop('default_alpha', 0.5)
+        self.default_alpha = kwargs.pop('default_alpha', 0.4)
         self.closed = kwargs.pop('closed', False)
         self.readonly = kwargs.pop('readonly', False)
         self.patch_kwargs = kwargs
