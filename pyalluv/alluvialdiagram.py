@@ -206,7 +206,7 @@ class AlluvialPlot(object):
         axes.spines['left'].set_color('none')
         axes.spines['top'].set_color('none')
         axes.spines['bottom'].set_color('none')
-        if self._x_dates:
+        if self.format_xaxis:  # self._x_dates:
             # set dates as x-axis
             self.set_dates_xaxis(axes, _minor_tick)
 
