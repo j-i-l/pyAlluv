@@ -19,7 +19,7 @@ class AlluvialPlot(object):
             x position a list of nodes.
             If a dict is provided then the x position for each node is set
             to the key.
-        :param axes: a `~matplotlib.axes.Axes` object to draw the Sankey plot
+        :param axes: `~matplotlib.axes.Axes` object to draw an Alluvial diagram
             on.
         :param y_pos: 'overwrite', 'keep', 'complement'
             'overwrite': ignores existing y coordinates for a node and
@@ -36,6 +36,20 @@ class AlluvialPlot(object):
         :param flux_kwargs: dictionary styling the Path elements of fluxes.
                 Options:
                     facecolor, edgecolor, alpha, linewidth, ...
+                    Passing a string to facecolor and/or edgecolor will allow
+                    you to color fluxes relative to the color of their source
+                    respectively target nodes.
+                    Options are:
+                    - facecolor='node' or 'source_node' or 'target_node'
+                        will set the facecolor equal to the color of the
+                        respective node ('node' is equiv. to 'source_node').
+                    - facecolor='node_reside': set the facecolor to the color
+                        of the source node if both source and target node have
+                        the same color.
+                    - facecolor='node_migration': set facecolor to the color
+                        of the source node if source and target node are of
+                        different color.
+                    The same options apply for the edgecolor.
         :param kwargs:
             Options:
                 - x_lim: tuple
@@ -908,14 +922,35 @@ class Flux(object):
         _kwargs.update(self.patch_kwargs)
         for _color in ['facecolor', 'edgecolor']:
             _set_color = _kwargs.pop(_color, None)
+            color_is_set = False
+            print(_set_color, _color)
             if _set_color == 'source_node' or _set_color == 'node':
-                _kwargs[_color] = self.source_node.patch_kwargs.get(
-                    _color, None
-                )
+                from_node = self.source_node
+                color_is_set = True
             elif _set_color == 'target_node':
-                _kwargs[_color] = self.target_node.patch_kwargs.get(
+                from_node = self.target_node
+                color_is_set = True
+            elif isinstance(_set_color, str) and '__' in _set_color:
+                which_node, flow_type = _set_color.split('__')
+                if which_node == 'target_node':
+                    from_node = self.target_node
+                else:
+                    from_node = self.source_node
+                if flow_type == 'migration' \
+                        and self.source_node.patch_kwargs.get(_color) \
+                        != self.target_node.patch_kwargs.get(_color):
+                    color_is_set = True
+                elif flow_type == 'reside'  \
+                        and self.source_node.patch_kwargs.get(_color) \
+                        == self.target_node.patch_kwargs.get(_color):
+                    color_is_set = True
+                else:
+                    _set_color = None
+            if color_is_set:
+                _kwargs[_color] = from_node.patch_kwargs.get(
                     _color, None
                 )
+
             # set it back
             else:
                 _kwargs[_color] = _set_color
