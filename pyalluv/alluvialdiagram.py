@@ -923,7 +923,6 @@ class Flux(object):
         for _color in ['facecolor', 'edgecolor']:
             _set_color = _kwargs.pop(_color, None)
             color_is_set = False
-            print(_set_color, _color)
             if _set_color == 'source_node' or _set_color == 'node':
                 from_node = self.source_node
                 color_is_set = True
