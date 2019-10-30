@@ -878,7 +878,11 @@ class Flux(object):
         self.out_flux_vanish = kwargs.pop('out_flux_vanish', 'top')
         self.default_fc = kwargs.pop('default_fc', 'gray')
         self.default_ec = kwargs.pop('default_ec', 'gray')
-        self.default_alpha = kwargs.pop('default_alpha', 0.4)
+        self.default_alpha = kwargs.pop('default_alpha', 0.3)
+        # self.default_alpha = kwargs.pop(
+        #         'default_alpha',
+        #         kwargs.get('alpha', {}).pop('default', 0.3)
+        #         )
         self.closed = kwargs.pop('closed', False)
         self.readonly = kwargs.pop('readonly', False)
         self.patch_kwargs = kwargs
@@ -922,6 +926,10 @@ class Flux(object):
         _kwargs.update(self.patch_kwargs)
         for _color in ['facecolor', 'edgecolor']:
             _set_color = _kwargs.pop(_color, None)
+            _set_alpha = _kwargs.pop('alpha', None)
+            if isinstance(_set_alpha, (int, float)):
+                _kwargs['alpha'] = _set_alpha
+                _set_alpha = None
             color_is_set = False
             if _set_color == 'source_node' or _set_color == 'node':
                 from_node = self.source_node
@@ -939,10 +947,24 @@ class Flux(object):
                         and self.source_node.patch_kwargs.get(_color) \
                         != self.target_node.patch_kwargs.get(_color):
                     color_is_set = True
+                    if _set_alpha:
+                        _kwargs['alpha'] = _set_alpha.get(
+                                'migration', _set_alpha.get(
+                                    'default',
+                                    self.default_alpha
+                                    )
+                                )
                 elif flow_type == 'reside'  \
                         and self.source_node.patch_kwargs.get(_color) \
                         == self.target_node.patch_kwargs.get(_color):
                     color_is_set = True
+                    if _set_alpha:
+                        _kwargs['alpha'] = _set_alpha.get(
+                                'reside', _set_alpha.get(
+                                    'default',
+                                    self.default_alpha
+                                    )
+                                )
                 else:
                     _set_color = None
             if color_is_set:
@@ -958,6 +980,12 @@ class Flux(object):
                         _kwargs[_color] = self.default_fc
                     elif _color == 'edgecolor':
                         _kwargs[_color] = self.default_ec
+                if _set_alpha:
+                    _kwargs['alpha'] = _set_alpha.get(
+                            'default',
+                            self.default_alpha
+                            )
+        # line below is probably not needed as alpha is set with the color
         _kwargs['alpha'] = _kwargs.get('alpha', self.default_alpha)
         # set in/out only flux styling
         _in_kwargs = dict(_kwargs)
