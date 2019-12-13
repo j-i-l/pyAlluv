@@ -32,12 +32,14 @@ class Cluster(object):
         Determine where the anchor position is relative to the rectangle
         that will represent this cluster. Options are either the left or
         right corner or centered:
+      linewidth: float (default=0.0)
+        Set the width of the line surrounding a cluster.
       facecolors:
         b
-        edgecolors
-        linewidths
-        linestyles
-        antialiaseds
+        edgecolor
+        linewidth
+        linestyle
+        antialiased
         readonly
         label: cluster label
         label_margin: (horizontal, vertical)
@@ -70,6 +72,9 @@ class Cluster(object):
         self._closed = kwargs.pop('closed', False)
         self._readonly = kwargs.pop('readonly', False)
         self.patch_kwargs = kwargs
+        self.patch_kwargs['lw'] = self.patch_kwargs.pop(
+                'linewidth', self.patch_kwargs.pop('lw', 0.0)
+                )
         if isinstance(height, (list, tuple)):
             self.height = len(height)
         else:

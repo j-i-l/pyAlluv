@@ -12,7 +12,7 @@ class AlluvialPlot(object):
     ===========
     clusters: either a list of :obj:`.Cluster` or a dict holding
       for each x position a list of clusters.
-      If a dict is provided then the x position for each cluster is set
+      If a dict is provided then the x position for each cluster is set equal
       to the key.
     axes: :class:`matplotlib.axes.Axes`
       Axes to draw an Alluvial diagram on.
@@ -33,20 +33,23 @@ class AlluvialPlot(object):
         `facecolor`, `edgecolor`, `alpha`, `linewidth`, ...
 
     flux_kwargs: dict (default={})
-      dictionary styling the Path elements of fluxes.
+      dictionary styling the :obj:`~matplotlib.patches.PathPatch` of fluxes.
 
-      accepted keys:
-        `facecolor`, `edgecolor`, `alpha`, `linewidth`, ...
+      accepted keys: see :class:`~matplotlib.patches.PathPatch`
+
+      Note
+      ----
 
         Passing a string to facecolor and/or edgecolor will allow
         you to color fluxes relative to the color of their source
         respectively target clusters.
 
-        Examples:
+        Examples
+        ---------
 
           'cluster' or 'source_cluster' or 'target_cluster'
           will set the facecolor equal to the color of the
-          respective cluster ('cluster' is equiv. to 'source_cluster').
+          respective cluster. *'cluster' is equiv. to 'source_cluster'.*
 
           ``facecolor='cluster_reside'``
             set the facecolor to the color
@@ -88,7 +91,7 @@ class AlluvialPlot(object):
         cluster_kwargs={}, flux_kwargs={}, label_kwargs={},
         **kwargs
             ):
-        # if the clusters are given in a list of lists (each list is a x position)
+        # if clusters are given in a list of lists (each list is a x position)
         self._set_x_pos = kwargs.get('set_x_pos', True)
         self._redistribute_vertically = kwargs.get(
             'redistribute_vertically',
@@ -117,7 +120,7 @@ class AlluvialPlot(object):
         if self._set_x_pos:
             for x_pos in self.x_positions:
                 for cluster in self.clusters[x_pos]:
-                    cluster.x_pos = x_pos
+                    cluster = cluster.set_x_pos(x_pos)
         self._x_dates = False
         _minor_tick = 'months'
         if isinstance(self.x_positions[0], datetime):
@@ -257,7 +260,9 @@ class AlluvialPlot(object):
         # set positioning
         self._distribute_column(x_pos, self.cluster_w_spacing)
         # now sort again considering the fluxes.
-        old_mid_heights = [cluster.mid_height for cluster in self.clusters[x_pos]]
+        old_mid_heights = [
+                cluster.mid_height for cluster in self.clusters[x_pos]
+                ]
         # do the redistribution 4 times
         _redistribute = False
         for _ in range(self._redistribute_vertically):

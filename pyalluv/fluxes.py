@@ -65,6 +65,9 @@ class Flux(object):
         self.closed = kwargs.pop('closed', False)
         self.readonly = kwargs.pop('readonly', False)
         self.patch_kwargs = kwargs
+        self.patch_kwargs['lw'] = self.patch_kwargs.pop(
+                'linewidth', self.patch_kwargs.pop('lw', 0.0)
+                )
 
         if isinstance(flux, (list, tuple)):
             self.flux = len(flux)
