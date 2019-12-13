@@ -26,10 +26,9 @@ Examples
 
 .. exclusion-marker-do-not-remove
 
-See :download:`life_cycle_events.py <examples/live_cycle_events.py>`_
-
+See `life_cycle_events.py <examples/life_cycle_events.py>`_
 
 Documentation
 ==============
 
-`http://pyalluv.rtfd.io/>`
+http://pyalluv.rtfd.io/
