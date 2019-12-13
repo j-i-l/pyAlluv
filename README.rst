@@ -11,27 +11,25 @@ Installation
 
 You can install `pyalluv` using
 
-.. code-block::
+.. code-block:: console
 
     pip install pyalluv
 
 Or get the latest version with
 
-.. code-block::
+.. code-block:: console
 
     pip install --upgrade --no-deps git+https://github.com/j-i-l/pyalluv.git
 
 Examples
 =========
 
-Minimal example
-----------------
-
-    >>> from pyalluv import AlluvialPlot
-    >>> AlluvialPlot(...
-
-
 .. exclusion-marker-do-not-remove
+
+See :download:`life_cycle_events.py <examples/live_cycle_events.py>`_
+
 
 Documentation
 ==============
+
+`http://pyalluv.rtfd.io/>`
