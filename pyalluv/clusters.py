@@ -49,6 +49,8 @@ class Cluster(object):
     -----------
     x_pos: float
       Horizontal position of the cluster anchor.
+    y_pos: float
+      Vertical position of the cluster center.
     x_anchor: str
       Anchor position relative to the rectangle representing the cluster.
       Possible values are: ``'center'``, ``'left'`` or ``'right'``.

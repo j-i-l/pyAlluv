@@ -8,22 +8,52 @@ from bisect import bisect_left
 
 class AlluvialPlot(object):
     r"""
+
     Parameters
     ===========
-    clusters: either a list of :obj:`.Cluster` or a dict holding
-      for each x position a list of clusters.
-      If a dict is provided then the x position for each cluster is set equal
-      to the key.
+
+    clusters: dict[str, dict], dict[float, list] or list[list]
+      You have 2 options to create an Alluvial diagram\:
+
+      raw data: dict[str, dict]
+        *NOT IMPLEMENTED YET*
+
+        Provide for each cluster (`key`) a dictionary specifying the
+        out-fluxes in the form of a dictionary (`key`: cluster, `value`: flux).
+
+        .. note::
+
+          The `key` ``None`` can hold a dictionary specifying fluxes from/to
+          outside the system. If is present in the provided dictionary it
+          allows to specify in-fluxes, i.e. data source that were not present
+          at the previous slice.
+
+          If it is present in the out-fluxes of a cluster, the specified amount
+          simply vanishes and will not lead to a flux.
+
+      collections of :obj:`.Cluster`: dict[float, list] and list[list]
+        If a `list` is provided each element must be a `list` of :obj:`.Cluster`
+        objects. A `dictionary` must provide a `list` of
+        :obj:`.Cluster` (*value*) for a horizontal position (*key*), e.g.
+        ``{1.0: [c11, c12, ...], 2.0: [c21, c22, ...], ...}``.
+
     axes: :class:`matplotlib.axes.Axes`
       Axes to draw an Alluvial diagram on.
-    y_pos: str 'overwrite', 'keep', 'complement'
-        'overwrite': ignores existing y coordinates for a cluster and
-            determines the y position according to the fluxes.
-        'keep': uses for each cluster the set y_pos. If a cluster has no y
-            position set this raises an exception.
-        'complement': uses the y position of each cluster, if set. If a
-            cluster has no y position then it is determined relative to the
-            other clusters.
+    y_pos: str
+      **options:** ``'overwrite'``, ``'keep'``, ``'complement'``, ``'sorted'``
+
+      'overwrite':
+         Ignore existing y coordinates for a cluster and set the vertical
+         position to minimize the vertical displacements of all fluxes.
+      'keep':
+        use the cluster's :attr:`~pyalluv.clusters.Cluster.y_pos`. If a
+        cluster has no y position set this raises an exception.
+      'complement':
+        use the cluster's :attr:`~pyalluv.clusters.Cluster.y_pos` if
+        set. Cluster without y position are positioned relative to the other
+        clusters by minimizing the vertical displacements of all fluxes.
+      'sorted':
+        NOT IMPLEMENTED YET
     cluster_w_spacing: float, int (default=1)
       Vertical spacing between clusters
     cluster_kwargs: dict (default={})
@@ -35,30 +65,35 @@ class AlluvialPlot(object):
     flux_kwargs: dict (default={})
       dictionary styling the :obj:`~matplotlib.patches.PathPatch` of fluxes.
 
-      accepted keys: see :class:`~matplotlib.patches.PathPatch`
+      for a list of available options see
+      :class:`~matplotlib.patches.PathPatch`
 
       Note
-      ----
+      -----
 
-        Passing a string to facecolor and/or edgecolor will allow
-        you to color fluxes relative to the color of their source
-        respectively target clusters.
+        Passing a string to `facecolor` and/or `edgecolor` allows to color
+        fluxes relative to the color of their source or target clusters.
 
-        Examples
-        ---------
+        ``'source_cluster'`` or ``'target_cluster'``:
+          will set the facecolor equal to the color of the respective cluster.
 
-          'cluster' or 'source_cluster' or 'target_cluster'
-          will set the facecolor equal to the color of the
-          respective cluster. *'cluster' is equiv. to 'source_cluster'.*
+          ``'cluster'`` *and* ``'source_cluster'`` *are equivalent.*
+
+        ``'<cluster>_reside'`` or ``'<cluster>_migration'``:
+          set the color based on whether source and target cluster have the
+          same color or not. ``'<cluster>'`` should be either
+          ``'source_cluster'`` or ``'target_cluster'`` and determines the
+          cluster from which the color is taken.
+
+          **Examples\:**
 
           ``facecolor='cluster_reside'``
-            set the facecolor to the color
-            of the source cluster if both source and target cluster have
-            the same color.
+            set `facecolor` to the color of the source cluster if both source
+            and target cluster are of the same color.
 
           ``edgecolor='cluster_migration'``
-            set edgecolor to the color of the source cluster if source and
-            target cluster are of different color.
+            set `edgecolor` to the color of the source cluster if source and
+            target cluster are of different colors.
 
     \**kwargs optional parameter:
         x_lim: tuple

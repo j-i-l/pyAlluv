@@ -9,10 +9,11 @@ Welcome to PyAlluv's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   :glob:
 
    readme_include
-   api/*
+   api/pyalluv.plotting
+   api/pyalluv.clusters
+   api/pyalluv.fluxes
    modules
 
 
