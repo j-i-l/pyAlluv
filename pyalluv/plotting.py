@@ -120,6 +120,9 @@ class AlluvialPlot(object):
 
     Attributes
     ===========
+
+    clusters: dict
+      Holds for each vertical position a list of :obj:`.Cluster` objects.
     """
     def __init__(
         self, clusters, axes, y_pos='overwrite', cluster_w_spacing=1,
@@ -213,7 +216,8 @@ class AlluvialPlot(object):
                         if self._swap_clusters(n1, n2, 'forwards'):
                             n2.set_y_pos(n1.y_pos)
                             n1.set_y_pos(
-                                    n2.y_pos + n2.height + self.cluster_w_spacing
+                                    n2.y_pos + n2.height +
+                                    self.cluster_w_spacing
                                     )
                             self.clusters[x_pos][nbr_clusters-i] = n1
                             self.clusters[x_pos][nbr_clusters-i-1] = n2
@@ -283,8 +287,15 @@ class AlluvialPlot(object):
             self.set_dates_xaxis(axes, _minor_tick)
 
     def distribute_clusters(self, x_pos):
-        """
+        r"""
         Distribute the clusters for a given x_position vertically
+
+        Parameters
+        -----------
+        x_pos: float
+          The horizontal position at which the clusters should be distributed.
+          This must be a `key` of the :attr:`~.AlluvialPlot.clusters`
+          attribute.
         """
         nbr_clusters = len(self.clusters[x_pos])
         # sort clusters according to height
@@ -621,9 +632,11 @@ class AlluvialPlot(object):
 
         Parameters
         -----------
-        patches: list[:class:`matplotlib.patches.PathPatch`]
+        patches: list[:class:`~matplotlib.patches.PathPatch`]
           Cluster patches to color.
-        colormap: :obj:`matplotlib.pyplot.cm` (default=:obj:`~matplotlib.pyplot.cm.rainbow`)
+        colormap: :obj:`matplotlib.cm` (default='rainbow')
+          See `the matplotlib tutorial for colormaps <https://matplotlib.org/tutorials/colors/colormaps.html>`_
+          for details.
 
         """
         nbr_clusters = len(patches)
