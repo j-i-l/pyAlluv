@@ -32,8 +32,8 @@ class AlluvialPlot(object):
           simply vanishes and will not lead to a flux.
 
       collections of :obj:`.Cluster`: dict[float, list] and list[list]
-        If a `list` is provided each element must be a `list` of :obj:`.Cluster`
-        objects. A `dictionary` must provide a `list` of
+        If a `list` is provided each element must be a `list`
+        of :obj:`.Cluster` objects. A `dictionary` must provide a `list` of
         :obj:`.Cluster` (*value*) for a horizontal position (*key*), e.g.
         ``{1.0: [c11, c12, ...], 2.0: [c21, c22, ...], ...}``.
 
@@ -104,6 +104,11 @@ class AlluvialPlot(object):
           if clusters is a dict then the key is set for all clusters
         cluster_width: float
           (NOT IMPLEMENTED) overwrites width of all clusters
+        format_xaxis: bool (default=True)
+          If set to `True` the axes is be formatted according to the data
+          provided. For now, this is only relevant if the horizontal positions
+          are :class:`~datetime.datetime` objects.
+          See :meth:`~.AlluvialPlot._set_dates_xaxis` for further informations.
         x_axis_offset: float
           how much space (relative to total height)
           should be reserved for the x_axis. If set to 0.0, then
@@ -136,7 +141,7 @@ class AlluvialPlot(object):
             4
         )
         self.with_cluster_labels = kwargs.get('with_cluster_labels', True)
-        self.format_xaxis = kwargs.get('format_xaxis', False)
+        self.format_xaxis = kwargs.get('format_xaxis', True)
         self._cluster_kwargs = cluster_kwargs
         self._flux_kwargs = flux_kwargs
         self._x_axis_offset = kwargs.get('x_axis_offset', 0.0)
@@ -206,7 +211,7 @@ class AlluvialPlot(object):
             for x_pos in self.x_positions:
                 self.distribute_clusters(x_pos)
             for x_pos in self.x_positions:
-                self.move_new_clusters(x_pos)
+                self._move_new_clusters(x_pos)
             for x_pos in self.x_positions:
                 nbr_clusters = len(self.clusters[x_pos])
                 for _ in range(nbr_clusters):
@@ -282,9 +287,8 @@ class AlluvialPlot(object):
         axes.spines['left'].set_color('none')
         axes.spines['top'].set_color('none')
         axes.spines['bottom'].set_color('none')
-        if self.format_xaxis:  # self._x_dates:
-            # set dates as x-axis
-            self.set_dates_xaxis(axes, _minor_tick)
+        if isinstance(self.x_positions[0], datetime) and self.format_xaxis:
+            self._set_dates_xaxis(axes, _minor_tick)
 
     def distribute_clusters(self, x_pos):
         r"""
@@ -390,7 +394,28 @@ class AlluvialPlot(object):
             _max_y
         ) if self.y_max is not None else _max_y
 
-    def set_dates_xaxis(self, ax, resolution='months'):
+    def _set_dates_xaxis(self, ax, resolution='months'):
+        r"""
+        Format the x axis in case :class:`~datetime.datetime` objects are
+        provide for the horizontal placement of clusters.
+
+        Parameters
+        -----------
+        ax: :class:`~matplotlib.axes.Axes`
+          Object to plot the alluvial diagram on.
+        resolution: str (default='months')
+          Possible values are ``'months'`` and ``'weeks'``.
+          This determines the resolution of the minor ticks via
+          :obj:`~matplotlib.axis.Axis.set_minor_formatter`.
+          The major tick is then either given in years or months.
+
+          .. todo::
+
+            Include further options or allow passing parameters directly to
+            :meth:`~matplotlib.axis.Axis.set_minor_formatter` and
+            :meth:`~matplotlib.axis.Axis.set_major_formatter`.
+
+        """
         import matplotlib.dates as mdates
         years = mdates.YearLocator()
         months = mdates.MonthLocator()
@@ -443,7 +468,8 @@ class AlluvialPlot(object):
         # inverse order and check again
         assert n1.y_pos < n2.y_pos
         inv_mid_height = {
-            n1: n2.y_pos + n2.height + self.cluster_w_spacing + 0.5 * n1.height,
+            n1: n2.y_pos + n2.height + self.cluster_w_spacing
+            + 0.5 * n1.height,
             n2: n1.y_pos + 0.5 * n2.height
             }
         squared_diff_inf = {}
@@ -480,14 +506,26 @@ class AlluvialPlot(object):
         else:
             return False
 
-    def move_new_clusters(self, x_pos):
-        """
+    def _move_new_clusters(self, x_pos):
+        r"""
+        This method redistributes fluxes without in-flux so to minimize the
+        vertical displacement of out-fluxes.
+
+        Parameters
+        -----------
+        x_pos: float
+          The horizontal position where new clusters without in-flux should be
+          distributed. This must be a `key` of the
+          :attr:`~.AlluvialPlot.clusters` attribute.
+
         Once the clusters are distributed for all x positions this method
         redistributes within a given x_positions the clusters that have no
         influx but out fluxes. The clusters are moved closer (vertically) to
         the target clusters of the out flux(es).
         """
-        old_mid_heights = [cluster.mid_height for cluster in self.clusters[x_pos]]
+        old_mid_heights = [
+                cluster.mid_height for cluster in self.clusters[x_pos]
+                ]
         _redistribute = False
         for cluster in self.clusters[x_pos]:
             if sum([_flux.flux_width for _flux in cluster.in_fluxes]) == 0.0:
@@ -635,7 +673,8 @@ class AlluvialPlot(object):
         patches: list[:class:`~matplotlib.patches.PathPatch`]
           Cluster patches to color.
         colormap: :obj:`matplotlib.cm` (default='rainbow')
-          See `the matplotlib tutorial for colormaps <https://matplotlib.org/tutorials/colors/colormaps.html>`_
+          See the matplotlib tutorial for colormaps
+          (`link <https://matplotlib.org/tutorials/colors/colormaps.html>`_)
           for details.
 
         """
