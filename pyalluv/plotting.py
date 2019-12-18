@@ -105,10 +105,10 @@ class AlluvialPlot(object):
         cluster_width: float
           (NOT IMPLEMENTED) overwrites width of all clusters
         format_xaxis: bool (default=True)
-          If set to `True` the axes is be formatted according to the data
+          If set to `True` the axes is formatted according to the data
           provided. For now, this is only relevant if the horizontal positions
           are :class:`~datetime.datetime` objects.
-          See :meth:`~.AlluvialPlot._set_dates_xaxis` for further informations.
+          See :meth:`~.AlluvialPlot.set_dates_xaxis` for further informations.
         x_axis_offset: float
           how much space (relative to total height)
           should be reserved for the x_axis. If set to 0.0, then
@@ -288,7 +288,7 @@ class AlluvialPlot(object):
         axes.spines['top'].set_color('none')
         axes.spines['bottom'].set_color('none')
         if isinstance(self.x_positions[0], datetime) and self.format_xaxis:
-            self._set_dates_xaxis(axes, _minor_tick)
+            self.set_dates_xaxis(axes, _minor_tick)
 
     def distribute_clusters(self, x_pos):
         r"""
@@ -394,7 +394,7 @@ class AlluvialPlot(object):
             _max_y
         ) if self.y_max is not None else _max_y
 
-    def _set_dates_xaxis(self, ax, resolution='months'):
+    def set_dates_xaxis(self, ax, resolution='months'):
         r"""
         Format the x axis in case :class:`~datetime.datetime` objects are
         provide for the horizontal placement of clusters.
