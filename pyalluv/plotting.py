@@ -62,6 +62,12 @@ class AlluvialPlot(object):
       Keys:
         `facecolor`, `edgecolor`, `alpha`, `linewidth`, ...
 
+    cluster_kwargs: dict (default={})
+      dictionary styling the :obj:`~matplotlib.patches.PathPatch` of clusters.
+
+      for a list of available options see
+      :class:`~matplotlib.patches.PathPatch`
+
     flux_kwargs: dict (default={})
       dictionary styling the :obj:`~matplotlib.patches.PathPatch` of fluxes.
 
@@ -122,6 +128,9 @@ class AlluvialPlot(object):
           with x_pos as keys and a list of tuples
           (cluster labels) as values. The position of clusters (tuples)
           are swapped.
+        redistribute_vertically: int (default=4)
+          how often the vertical pairwise swapping of clusters at a given time
+          point should be performed.
 
     Attributes
     ===========

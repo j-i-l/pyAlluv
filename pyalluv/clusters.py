@@ -34,16 +34,8 @@ class Cluster(object):
         right corner or centered:
       linewidth: float (default=0.0)
         Set the width of the line surrounding a cluster.
-      facecolors:
-        b
-        edgecolor
-        linewidth
-        linestyle
-        antialiased
-        readonly
-        label: cluster label
-        label_margin: (horizontal, vertical)
-
+      label_margin: tuple(horizontal, vertical)
+        Sets horizontal and vertical margins for the label of a cluster.
 
     Attributes
     -----------
