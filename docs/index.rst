@@ -11,10 +11,7 @@ Welcome to PyAlluv's documentation!
    :caption: Contents:
 
    readme_include
-   api/pyalluv.plotting
-   api/pyalluv.clusters
-   api/pyalluv.fluxes
-   modules
+   api/pyalluv
 
 
 
