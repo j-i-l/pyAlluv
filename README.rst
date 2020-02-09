@@ -4,7 +4,11 @@ pyAlluv
 
 Package to draw alluvial plots with matplotlib.
 
-Checkout the `documentation <https://pyalluv.rtfd.io/>`_ to get started.
+.. figure:: docs/_static/life_cycles.png
+
+    Alluvialdiagram illustrating life-cycle events in a dynamic community.
+
+To get started checkout the `documentation <https://pyalluv.rtfd.io/>`_.
 
 .. inclusion-marker-do-not-remove
 
@@ -17,12 +21,6 @@ You can get the latest version with
 
     pip install --upgrade --no-deps git+https://github.com/j-i-l/pyalluv.git
     
-or (soon) install `pyalluv` using
-
-.. code-block:: console
-
-    pip install pyalluv
-
 
 Examples
 =========
