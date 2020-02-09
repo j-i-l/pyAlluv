@@ -7,6 +7,9 @@ Package to draw alluvial plots with matplotlib.
 .. figure:: docs/_static/life_cycles.png
 
     Alluvialdiagram illustrating life-cycle events in a dynamic community.
+    source: `life_cycle_events.py`_ 
+
+.. _life_cycle_events.py: examples/life_cycle_events.py
 
 To get started checkout the `documentation <https://pyalluv.rtfd.io/>`_.
 
