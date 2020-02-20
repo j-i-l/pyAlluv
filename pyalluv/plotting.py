@@ -133,7 +133,7 @@ class AlluvialPlot(object):
           point should be performed.
         y_offset: float
           offsets the vertical position of each cluster by this amount.
-          
+
           .. note::
 
             This ca be used to draw multiple alluvial diagrams on the same
@@ -185,6 +185,7 @@ class AlluvialPlot(object):
                     cluster = cluster.set_x_pos(x_pos)
         self._x_dates = False
         _minor_tick = 'months'
+        cluster_widths = []
         if isinstance(self.x_positions[0], datetime):
             # assign date locator/formatter to the x-axis to get proper labels
             if self.format_xaxis:
@@ -204,6 +205,7 @@ class AlluvialPlot(object):
                 for cluster in self.clusters[x_pos]:
                     # in days (same as mdates.date2num)
                     cluster.width = cluster.width.total_seconds()/60/60/24
+                    cluster_widths.append(node.width)
                     if cluster.label_margin is not None:
                         _h_margin = cluster.label_margin[
                                 0].total_seconds()/60/60/24
@@ -219,9 +221,11 @@ class AlluvialPlot(object):
                 'x_lim',
                 (
                     self.x_positions[0]
-                    - 2 * self.clusters[self.x_positions[0]][0].width,
+                    - 2 * min(cluster_width),
+                    # - 2 * self.clusters[self.x_positions[0]][0].width,
                     self.x_positions[-1]
-                    + 2 * self.clusters[self.x_positions[-1]][0].width,
+                    + 2 * min(cluster_width),
+                    # + 2 * self.clusters[self.x_positions[-1]][0].width,
                     )
                 )
         self.y_min, self.y_max = None, None
