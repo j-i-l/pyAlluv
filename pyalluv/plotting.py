@@ -325,97 +325,98 @@ class AlluvialPlot(object):
           attribute.
         """
         nbr_clusters = len(self.clusters[x_pos])
-        # sort clusters according to height
-        _clusters = sorted(self.clusters[x_pos], key=lambda x: x.height)
-        # sort so to put biggest height in the middle
-        self.clusters[x_pos] = _clusters[::-2][::-1] + \
-            _clusters[nbr_clusters % 2::2][::-1]
-        # set positioning
-        self._distribute_column(x_pos, self.cluster_w_spacing)
-        # now sort again considering the fluxes.
-        old_mid_heights = [
-                cluster.mid_height for cluster in self.clusters[x_pos]
-                ]
-        # do the redistribution 4 times
-        _redistribute = False
-        for _ in range(self._redistribute_vertically):
-            for cluster in self.clusters[x_pos]:
-                weights = []
-                positions = []
-                for in_flux in cluster.in_fluxes:
-                    if in_flux.source_cluster is not None:
-                        weights.append(in_flux.flux_width)
-                        positions.append(in_flux.source_cluster.mid_height)
-                if sum(weights) > 0.0:
-                    _redistribute = True
-                    cluster.set_mid_height(
-                            sum(
-                                [weights[i] * positions[i]
-                                    for i in range(len(weights))]
-                                ) / sum(weights)
-                            )
-            if _redistribute:
-                sort_key = [
-                    bisect_left(
-                        old_mid_heights, self.clusters[x_pos][i].mid_height
-                    ) for i in range(nbr_clusters)
-                ]
-                cs, _sort_key = zip(
-                    *sorted(
-                        zip(
-                            list(range(nbr_clusters)),
-                            sort_key,
-                        ),
-                        key=lambda x: x[1]
-                    )
-                )
-                self.clusters[x_pos] = [self.clusters[x_pos][_k] for _k in cs]
-                # redistribute them
-                self._distribute_column(x_pos, self.cluster_w_spacing)
-                old_mid_heights = [
+        if nbr_clusters:
+            # sort clusters according to height
+            _clusters = sorted(self.clusters[x_pos], key=lambda x: x.height)
+            # sort so to put biggest height in the middle
+            self.clusters[x_pos] = _clusters[::-2][::-1] + \
+                _clusters[nbr_clusters % 2::2][::-1]
+            # set positioning
+            self._distribute_column(x_pos, self.cluster_w_spacing)
+            # now sort again considering the fluxes.
+            old_mid_heights = [
                     cluster.mid_height for cluster in self.clusters[x_pos]
-                ]
-            else:
-                break
-        # perform pairwise swapping for backwards fluxes
-        for _ in range(int(0.5 * nbr_clusters)):
-            for i in range(1, nbr_clusters):
-                n1, n2 = self.clusters[x_pos][i-1], self.clusters[x_pos][i]
-                if self._swap_clusters(n1, n2, 'backwards'):
-                    n2.set_y_pos(n1.y_pos)
-                    n1.set_y_pos(
-                            n2.y_pos + n2.height + self.cluster_w_spacing
-                            )
-                    self.clusters[x_pos][i-1], self.clusters[x_pos][i] = n2, n1
-        for _ in range(int(0.5 * nbr_clusters)):
-            for i in range(1, nbr_clusters):
-                n1 = self.clusters[x_pos][nbr_clusters-i-1]
-                n2 = self.clusters[x_pos][nbr_clusters-i]
-                if self._swap_clusters(n1, n2, 'backwards'):
-                    n2.set_y_pos(n1.y_pos)
-                    n1.set_y_pos(
-                            n2.y_pos + n2.height + self.cluster_w_spacing
-                            )
-                    self.clusters[x_pos][nbr_clusters-i-1] = n2
-                    self.clusters[x_pos][nbr_clusters-i] = n1
+                    ]
+            # do the redistribution 4 times
+            _redistribute = False
+            for _ in range(self._redistribute_vertically):
+                for cluster in self.clusters[x_pos]:
+                    weights = []
+                    positions = []
+                    for in_flux in cluster.in_fluxes:
+                        if in_flux.source_cluster is not None:
+                            weights.append(in_flux.flux_width)
+                            positions.append(in_flux.source_cluster.mid_height)
+                    if sum(weights) > 0.0:
+                        _redistribute = True
+                        cluster.set_mid_height(
+                                sum(
+                                    [weights[i] * positions[i]
+                                        for i in range(len(weights))]
+                                    ) / sum(weights)
+                                )
+                if _redistribute:
+                    sort_key = [
+                        bisect_left(
+                            old_mid_heights, self.clusters[x_pos][i].mid_height
+                        ) for i in range(nbr_clusters)
+                    ]
+                    cs, _sort_key = zip(
+                        *sorted(
+                            zip(
+                                list(range(nbr_clusters)),
+                                sort_key,
+                            ),
+                            key=lambda x: x[1]
+                        )
+                    )
+                    self.clusters[x_pos] = [self.clusters[x_pos][_k] for _k in cs]
+                    # redistribute them
+                    self._distribute_column(x_pos, self.cluster_w_spacing)
+                    old_mid_heights = [
+                        cluster.mid_height for cluster in self.clusters[x_pos]
+                    ]
+                else:
+                    break
+            # perform pairwise swapping for backwards fluxes
+            for _ in range(int(0.5 * nbr_clusters)):
+                for i in range(1, nbr_clusters):
+                    n1, n2 = self.clusters[x_pos][i-1], self.clusters[x_pos][i]
+                    if self._swap_clusters(n1, n2, 'backwards'):
+                        n2.set_y_pos(n1.y_pos)
+                        n1.set_y_pos(
+                                n2.y_pos + n2.height + self.cluster_w_spacing
+                                )
+                        self.clusters[x_pos][i-1], self.clusters[x_pos][i] = n2, n1
+            for _ in range(int(0.5 * nbr_clusters)):
+                for i in range(1, nbr_clusters):
+                    n1 = self.clusters[x_pos][nbr_clusters-i-1]
+                    n2 = self.clusters[x_pos][nbr_clusters-i]
+                    if self._swap_clusters(n1, n2, 'backwards'):
+                        n2.set_y_pos(n1.y_pos)
+                        n1.set_y_pos(
+                                n2.y_pos + n2.height + self.cluster_w_spacing
+                                )
+                        self.clusters[x_pos][nbr_clusters-i-1] = n2
+                        self.clusters[x_pos][nbr_clusters-i] = n1
 
-        _min_y = min(
-                self.clusters[x_pos], key=lambda x: x.y_pos
-                ).y_pos - 2 * self.cluster_w_spacing
-        _max_y_cluster = max(
-                self.clusters[x_pos],
-                key=lambda x: x.y_pos + x.height
-                )
-        _max_y = _max_y_cluster.y_pos + \
-            _max_y_cluster.height + 2 * self.cluster_w_spacing
-        self.y_min = min(
-            self.y_min,
-            _min_y
-        ) if self.y_min is not None else _min_y
-        self.y_max = max(
-            self.y_max,
-            _max_y
-        ) if self.y_max is not None else _max_y
+            _min_y = min(
+                    self.clusters[x_pos], key=lambda x: x.y_pos
+                    ).y_pos - 2 * self.cluster_w_spacing
+            _max_y_cluster = max(
+                    self.clusters[x_pos],
+                    key=lambda x: x.y_pos + x.height
+                    )
+            _max_y = _max_y_cluster.y_pos + \
+                _max_y_cluster.height + 2 * self.cluster_w_spacing
+            self.y_min = min(
+                self.y_min,
+                _min_y
+            ) if self.y_min is not None else _min_y
+            self.y_max = max(
+                self.y_max,
+                _max_y
+            ) if self.y_max is not None else _max_y
 
     def set_dates_xaxis(self, ax, resolution='months'):
         r"""
