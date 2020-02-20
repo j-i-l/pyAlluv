@@ -221,10 +221,10 @@ class AlluvialPlot(object):
                 'x_lim',
                 (
                     self.x_positions[0]
-                    - 2 * min(cluster_width),
+                    - 2 * min(cluster_widths),
                     # - 2 * self.clusters[self.x_positions[0]][0].width,
                     self.x_positions[-1]
-                    + 2 * min(cluster_width),
+                    + 2 * min(cluster_widths),
                     # + 2 * self.clusters[self.x_positions[-1]][0].width,
                     )
                 )
