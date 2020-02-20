@@ -205,7 +205,7 @@ class AlluvialPlot(object):
                 for cluster in self.clusters[x_pos]:
                     # in days (same as mdates.date2num)
                     cluster.width = cluster.width.total_seconds()/60/60/24
-                    cluster_widths.append(node.width)
+                    cluster_widths.append(cluster.width)
                     if cluster.label_margin is not None:
                         _h_margin = cluster.label_margin[
                                 0].total_seconds()/60/60/24
