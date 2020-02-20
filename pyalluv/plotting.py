@@ -131,6 +131,15 @@ class AlluvialPlot(object):
         redistribute_vertically: int (default=4)
           how often the vertical pairwise swapping of clusters at a given time
           point should be performed.
+        y_offset: float
+          offsets the vertical position of each cluster by this amount.
+          
+          .. note::
+
+            This ca be used to draw multiple alluvial diagrams on the same
+            :obj:`~matplotlib.axes.Axes` by simply calling
+            :class:`~.AlluvialPlot` repeatedly with changing offset value, thus
+            stacking alluvial diagrams.
 
     Attributes
     ===========
@@ -157,6 +166,7 @@ class AlluvialPlot(object):
         self._fill_figure = kwargs.get('fill_figure', False)
         self._invisible_y = kwargs.get('invisible_y', True)
         self._invisible_x = kwargs.get('invisible_x', False)
+        self.y_offset = kwargs.get('y_offset', 0)
         self.y_fix = kwargs.get('y_fix', None)
         if isinstance(clusters, dict):
             self.clusters = clusters
@@ -592,6 +602,7 @@ class AlluvialPlot(object):
             for cluster in self.clusters[x_pos]:
                 # TODO: set color
                 # _cluster_color
+                cluster.set_y_pos(cluster.y_pos + self.y_offset)
                 cluster_patches.append(
                             cluster.get_patch(
                                 **cluster_kwargs
