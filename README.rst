@@ -2,6 +2,9 @@
 pyAlluv
 =======
 
+.. image:: https://zenodo.org/badge/184264168.svg
+   :target: https://zenodo.org/badge/latestdoi/184264168
+
 Package to draw alluvial plots with matplotlib.
 
 .. figure:: docs/_static/life_cycles.png
