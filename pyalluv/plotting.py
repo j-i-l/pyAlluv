@@ -214,7 +214,11 @@ class AlluvialPlot(object):
                                 )
                     cluster.set_x_pos(mdates.date2num(cluster.x_pos))
 
-        # TODO: set the cluster.width property with this
+        # TODO: set the cluster.width property
+        else:
+            for x_pos in self.x_positions:
+                for cluster in self.clusters[x_pos]:
+                    cluster_widths.append(cluster.width)
         self.cluster_width = kwargs.get('cluster_width', None)
         self.cluster_w_spacing = cluster_w_spacing
         self.x_lim = kwargs.get(
@@ -370,7 +374,9 @@ class AlluvialPlot(object):
                             key=lambda x: x[1]
                         )
                     )
-                    self.clusters[x_pos] = [self.clusters[x_pos][_k] for _k in cs]
+                    self.clusters[x_pos] = [
+                        self.clusters[x_pos][_k] for _k in cs
+                    ]
                     # redistribute them
                     self._distribute_column(x_pos, self.cluster_w_spacing)
                     old_mid_heights = [
@@ -387,7 +393,8 @@ class AlluvialPlot(object):
                         n1.set_y_pos(
                                 n2.y_pos + n2.height + self.cluster_w_spacing
                                 )
-                        self.clusters[x_pos][i-1], self.clusters[x_pos][i] = n2, n1
+                        self.clusters[x_pos][i-1] = n2
+                        self.clusters[x_pos][i] = n1
             for _ in range(int(0.5 * nbr_clusters)):
                 for i in range(1, nbr_clusters):
                     n1 = self.clusters[x_pos][nbr_clusters-i-1]
