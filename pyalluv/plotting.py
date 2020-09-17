@@ -42,8 +42,10 @@ class AlluvialPlot(object):
       will be drawn directly to this axes. Alternatively you can omit this
       argument when creating an instance and later call the
       :meth:`AlluvialPlot.draw_on` method.
+
     x_positions: list (default=None)
       A list with horizontal positioning of the clusters.
+
     y_pos: str
       **options:** ``'overwrite'``, ``'keep'``, ``'complement'``, ``'sorted'``
 
@@ -153,8 +155,9 @@ class AlluvialPlot(object):
       Holds for each vertical position a list of :obj:`.Cluster` objects.
     """
     def __init__(
-        self, clusters, axes=None, y_pos='overwrite', cluster_w_spacing=1,
-        cluster_kwargs={}, flux_kwargs={}, label_kwargs={},
+        self, clusters, axes=None, x_positions=None, y_pos='overwrite',
+        cluster_w_spacing=1, cluster_kwargs=None, flux_kwargs=None,
+        label_kwargs=None,
         **kwargs
             ):
         # if clusters are given in a list of lists (each list is a x position)
@@ -165,8 +168,9 @@ class AlluvialPlot(object):
         )
         self.with_cluster_labels = kwargs.get('with_cluster_labels', True)
         self.format_xaxis = kwargs.get('format_xaxis', True)
-        self._cluster_kwargs = cluster_kwargs
-        self._flux_kwargs = flux_kwargs
+        self._cluster_kwargs = cluster_kwargs or dict()
+        self._flux_kwargs = flux_kwargs or dict()
+        self._label_kwargs = label_kwargs or dict()
         self._x_axis_offset = kwargs.get('x_axis_offset', 0.0)
         self._fill_figure = kwargs.get('fill_figure', False)
         self._invisible_y = kwargs.get('invisible_y', True)
@@ -302,7 +306,7 @@ class AlluvialPlot(object):
         )
         axes.add_collection(patch_collection)
         if self.with_cluster_labels:
-            label_collection = self.get_labelcollection(**label_kwargs)
+            label_collection = self.get_labelcollection(**self._label_kwargs)
             if label_collection:
                 for label in label_collection:
                     axes.annotate(**label)
