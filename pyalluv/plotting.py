@@ -1,4 +1,5 @@
 from __future__ import division, absolute_import, unicode_literals
+import warnings
 from matplotlib.collections import PatchCollection
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -32,6 +33,17 @@ class AlluvialPlot(object):
           simply vanishes and will not lead to a flux.
 
       collections of :obj:`.Cluster`: list[list]
+
+        .. WARNING:: support for passing a dictionary will de dropped in the
+          next release, use a list instead and provide
+          :ref:`x_positions<xposref>` separately.
+          Converting a dictionary of clusters to the new format can
+          be done as follows:
+
+           .. code-block:: python
+
+            x_pos, clusters = zip(*sorted(clusters.items(),key=lambda x:x[0]))
+
         If a `list` is provided each element must be a `list`
         of :obj:`.Cluster` objects. A `dictionary` must provide a `list` of
         :obj:`.Cluster` (*value*) for a horizontal position (*key*), e.g.
@@ -43,7 +55,10 @@ class AlluvialPlot(object):
       argument when creating an instance and later call the
       :meth:`AlluvialPlot.draw_on` method.
 
+
     x_positions: list (default=None)
+      .. _xposref:
+
       A list with horizontal positioning of the clusters.
 
     y_pos: str
@@ -179,6 +194,11 @@ class AlluvialPlot(object):
         self.y_fix = kwargs.get('y_fix', None)
         self._clusters = {}
         if isinstance(clusters, dict):
+            warnings.warn(
+                "Support for providing a dictionary as argument for `clusters`"
+                " will be dropped in the next release.\nUse a list instead and"
+                " provide the x positions separately with the `x_positions`"
+                " argument.", PendingDeprecationWarning)
             # key is the x position here, value is a list of clusters
             self.clusters = clusters
             # create composed key
@@ -643,7 +663,7 @@ class AlluvialPlot(object):
             for cluster in self.clusters[x_pos]:
                 # TODO: set color
                 # _cluster_color
-                cluster.set_y_pos(cluster.y_pos + self.r_offset)
+                cluster.set_y_pos(cluster.y_pos + self.y_offset)
                 cluster_patches.append(
                             cluster.get_patch(
                                 **cluster_kwargs
