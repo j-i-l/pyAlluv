@@ -12,7 +12,7 @@ class AlluvialPlot(object):
     Parameters
     ===========
 
-    clusters: dict[str, dict], dict[float, list] or list[list]
+    clusters: list[list]
       You have 2 options to create an Alluvial diagram\:
 
       raw data: dict[str, dict]
@@ -31,14 +31,19 @@ class AlluvialPlot(object):
           If it is present in the out-fluxes of a cluster, the specified amount
           simply vanishes and will not lead to a flux.
 
-      collections of :obj:`.Cluster`: dict[float, list] and list[list]
+      collections of :obj:`.Cluster`: list[list]
         If a `list` is provided each element must be a `list`
         of :obj:`.Cluster` objects. A `dictionary` must provide a `list` of
         :obj:`.Cluster` (*value*) for a horizontal position (*key*), e.g.
         ``{1.0: [c11, c12, ...], 2.0: [c21, c22, ...], ...}``.
 
-    axes: :class:`matplotlib.axes.Axes`
-      Axes to draw an Alluvial diagram on.
+    axes: :class:`matplotlib.axes.Axes` (default=None)
+      Axes to draw an Alluvial diagram on. If provided the alluvial diagram
+      will be drawn directly to this axes. Alternatively you can omit this
+      argument when creating an instance and later call the
+      :meth:`AlluvialPlot.draw_on` method.
+    x_positions: list (default=None)
+      A list with horizontal positioning of the clusters.
     y_pos: str
       **options:** ``'overwrite'``, ``'keep'``, ``'complement'``, ``'sorted'``
 
@@ -136,7 +141,7 @@ class AlluvialPlot(object):
 
           .. note::
 
-            This ca be used to draw multiple alluvial diagrams on the same
+            This can be used to draw multiple alluvial diagrams on the same
             :obj:`~matplotlib.axes.Axes` by simply calling
             :class:`~.AlluvialPlot` repeatedly with changing offset value, thus
             stacking alluvial diagrams.
@@ -148,7 +153,7 @@ class AlluvialPlot(object):
       Holds for each vertical position a list of :obj:`.Cluster` objects.
     """
     def __init__(
-        self, clusters, axes, y_pos='overwrite', cluster_w_spacing=1,
+        self, clusters, axes=None, y_pos='overwrite', cluster_w_spacing=1,
         cluster_kwargs={}, flux_kwargs={}, label_kwargs={},
         **kwargs
             ):
@@ -168,15 +173,25 @@ class AlluvialPlot(object):
         self._invisible_x = kwargs.get('invisible_x', False)
         self.y_offset = kwargs.get('y_offset', 0)
         self.y_fix = kwargs.get('y_fix', None)
+        self._clusters = {}
         if isinstance(clusters, dict):
+            # key is the x position here, value is a list of clusters
             self.clusters = clusters
+            # create composed key
+            # TODO
+            self._clusters.update()
         else:
             self.clusters = {}
-            for cluster in clusters:
-                try:
-                    self.clusters[cluster.x_pos].append(cluster)
-                except KeyError:
-                    self.clusters[cluster.x_pos] = [cluster]
+            for idx, slice_clusters in enumerate(clusters):
+                for cluster in slice_clusters:
+                    if cluster.x_pos is not None:
+                        x_pos = cluster.x_pos
+                    else:
+                        x_pos = idx
+                    try:
+                        self.clusters[x_pos].append(cluster)
+                    except KeyError:
+                        self.clusters[x_pos] = [cluster]
         self.x_positions = sorted(self.clusters.keys())
         # set the x positions correctly for the clusters
         if self._set_x_pos:
@@ -316,6 +331,16 @@ class AlluvialPlot(object):
         axes.spines['bottom'].set_color('none')
         if isinstance(self.x_positions[0], datetime) and self.format_xaxis:
             self.set_dates_xaxis(axes, _minor_tick)
+
+    def draw_on(self, axes):
+        r"""
+        Draws the alluvial diagram onto the provided axes.
+
+        Parameters
+        ----------
+        axes: :class:`matplotlib.axes.Axes`
+        """
+        pass
 
     def distribute_clusters(self, x_pos):
         r"""
@@ -614,7 +639,7 @@ class AlluvialPlot(object):
             for cluster in self.clusters[x_pos]:
                 # TODO: set color
                 # _cluster_color
-                cluster.set_y_pos(cluster.y_pos + self.y_offset)
+                cluster.set_y_pos(cluster.y_pos + self.r_offset)
                 cluster_patches.append(
                             cluster.get_patch(
                                 **cluster_kwargs
@@ -648,8 +673,8 @@ class AlluvialPlot(object):
                 )
 
     def get_labelcollection(self, *args, **kwargs):
-        h_margin = kwargs.pop('h_margin', None)
-        v_margin = kwargs.pop('v_margin', None)
+        h_margin = kwargs.pop('h_margin', 0.1)
+        v_margin = kwargs.pop('v_margin', 0.1)
         if 'horizontalalignment' not in kwargs:
             kwargs['horizontalalignment'] = 'right'
         if 'verticalalignment' not in kwargs:

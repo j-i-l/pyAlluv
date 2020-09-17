@@ -78,7 +78,8 @@ class Cluster(object):
             x_coord, y_coord = anchor
         else:
             x_coord, y_coord = anchor, None
-        self = self.set_x_pos(x_coord).set_y_pos(y_coord)
+        self.set_x_pos(x_coord)
+        self.set_y_pos(y_coord)
 
         # init the in and out fluxes:
         self.out_fluxes = []
@@ -97,7 +98,7 @@ class Cluster(object):
 
     def set_x_pos(self, x_pos):
         r"""
-        Set the horizontal position of a cluster.
+        Set `self.x_pos`: the horizontal position of a cluster.
 
         The position is set according to the value provided in ``x_pos`` and
         ``self.x_anchor``.
@@ -109,8 +110,7 @@ class Cluster(object):
 
         Returns
         --------
-        self: :class:`.Cluster`
-          with new property ``x_pos``.
+        None
 
         """
         self.x_pos = x_pos
@@ -120,8 +120,6 @@ class Cluster(object):
                 self.x_pos += 0.5 * self.width
             elif self.x_anchor == 'right':
                 self.x_pos -= 0.5 * self.width
-
-        return self
 
     def get_patch(self, **kwargs):
         _kwargs = dict(kwargs)
@@ -323,7 +321,7 @@ class Cluster(object):
         else:
             self.mid_height = None
 
-        return self
+        return None
 
     def set_in_out_anchors(self,):
         """
