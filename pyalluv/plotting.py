@@ -646,7 +646,7 @@ class AlluvialPlot(object):
                     # textcoords='figure fraction',
                     # arrowprops=dict(facecolor='black', shrink=0.05),
                     cluster_label = {
-                            's': cluster.label,
+                            'text': cluster.label,
                             'xy': (
                                 cluster.x_pos - _h_margin,
                                 cluster.y_pos + _v_margin
