@@ -1,6 +1,9 @@
 =======
 pyAlluv
 =======
+.. image:: https://readthedocs.org/projects/pyalluv/badge/?version=latest
+   :target: https://pyalluv.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 .. image:: https://zenodo.org/badge/184264168.svg
    :target: https://zenodo.org/badge/latestdoi/184264168
