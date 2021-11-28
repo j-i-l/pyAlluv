@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Liechti"
+  given-names: "Jonas"
+  orcid: "https://orcid.org/0000-0003-3447-3060"
+title: "pyAlluv: Alluvial diagrams in python"
+version: 0.1.1
+doi: 10.5281/zenodo.3678351
+date-released: 2020-02-21
+url: "https://github.com/j-i-l/pyAlluv"
